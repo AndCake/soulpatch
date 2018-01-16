@@ -1,0 +1,14 @@
+<div class="main-slider">
+    <ul class="slider-track">
+        {{#sliderItems}}
+            <li class="slider-item">
+                {{.}}
+            </li>
+        {{/sliderItems}}
+        {{^sliderItems}}
+            <li class="slider-item">
+                <p>Nothing here...</p>
+            </li>
+        {{/sliderItems}}
+    </ul>
+</div>

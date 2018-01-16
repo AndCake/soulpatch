@@ -1,0 +1,20 @@
+{
+  "name": "soulpatch",
+  "version": "0.0.1",
+  "description": "A tiny CLI compiler for Mustache files to produce CommonJS javascript modules.",
+  "scripts": {
+    "test:compile": "./bin/compiler.js -o compiled 'templates/**/*.mustache'",
+    "test:render": "node server.js > test.html",
+    "test": "npm run test:compile && npm run test:render"
+  },
+  "bin": {
+    "soulpatch": "./bin/compiler.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^7.1.2",
+    "mkdirp": "^0.5.1",
+    "nopt": "^4.0.1"
+  }
+}
