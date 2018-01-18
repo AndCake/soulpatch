@@ -48,7 +48,7 @@ if (options.help) {
 
 Example:
 
-    ${package.name} -o ./dest src/**/*.mustache
+    ${package.name} -o ./dest 'src/**/*.mustache'
 
 Note:
 

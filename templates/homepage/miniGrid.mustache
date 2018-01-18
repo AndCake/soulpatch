@@ -1,4 +1,14 @@
 <div class="mini-grid">
+    <button data-toggle="showFilter">show filter</button>
+    {{#showFilter}}
+        <div class="filter">
+            <select>
+                <option value="">sort</option>
+                <option value="price">by price asc</option>
+                <option value="pricedesc">by price desc</option>
+            </select>
+        </div>
+    {{/showFilter}}
     <ul class="grid-item-container">
         {{#featuredProducts}}
             <li class="grid-item">
