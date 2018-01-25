@@ -1,7 +1,7 @@
 <div class="main-slider">
     <ul class="slider-track">
         {{#sliderItems}}
-            <li class="slider-item">
+            <li class="slider-item" data-action="remove:sliderItems.{{.index}}">
                 {{.}}
             </li>
         {{/sliderItems}}

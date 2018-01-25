@@ -88,12 +88,12 @@ const merge = 'function merge(t){return[].slice.call(arguments,1).forEach(functi
 }`*/;
 
 /* this is the base structure of the template */
-const baseCode = 'module.exports = (function(){ {{helperFunctions}};return{render:function(data){return [].concat({{render}}).join("")}}}());'/*`function() {
+const baseCode = 'module.exports = (function(){ {{helperFunctions}};return{render:function(data){return [].concat({{render}}\'\').join("")}}}());'/*`function() {
 	{{helperFunctions}}
 
 	return {
 		render: function(data) {
-			return [].concat({{render}}).join('')
+			return [].concat({{render}}'').join('')
 		}
 	};
 }());`*/;
@@ -102,7 +102,7 @@ const baseCode = 'module.exports = (function(){ {{helperFunctions}};return{rende
 /** takes an HTML string containing mustache code and turns it into executable JS code that generates a vdom */
 module.exports = function parse(data) {
 	let resultObject = {
-		helperFunctions: [Tag, safeAccess],
+		helperFunctions: [safeAccess],
 		render: ''
 	};
 	let usesMerge = false, usesRenderStyle = false, usesSpread = false;
@@ -133,7 +133,7 @@ module.exports = function parse(data) {
 			let value = key.substr(1);
 			if (key[0] === '#') {
 				// handle block start
-				result += `spread(toArray(${getData()}, '${value}').map(function (e, i, a) {
+				result += `(spread(toArray(${getData()}, '${value}').map(function (e, i, a) {
 						var data$${level + 1} = merge({}, data${0 >= level ? '' : '$' + level}, {'.': e, '.index': i, '.length': a.length}, e);
 						return [].concat(`;
 				level += 1;
@@ -141,14 +141,14 @@ module.exports = function parse(data) {
 				usesSpread = true;
 			} else if (key[0] === '/') {
 				// handle block end
-				result += '\'\'); })).join("")' + cat;
+				result += '\'\'); })).join(""))' + cat;
 				level -= 1;
 				if (level < 0) {
 					throw new Error('Unexpected end of block: ' + key.substr(1));
 				}
 			} else if (key[0] === '^') {
 				// handle inverted block start
-				result += `(safeAccess(${getData()}, '${value}') && (typeof safeAccess(${getData()}, '${value}') === 'boolean' || safeAccess(${getData()}, '${value}').length > 0)) ? [] : spread([1].map(function() { var data$${level + 1} = merge({}, data${0 >= level ? '' : '$' + level}); return [].concat(`;
+				result += `((safeAccess(${getData()}, '${value}') && (typeof safeAccess(${getData()}, '${value}') === 'boolean' || safeAccess(${getData()}, '${value}').length > 0)) ? [] : spread([1].map(function() { var data$${level + 1} = merge({}, data${0 >= level ? '' : '$' + level}); return [].concat(`;
 				usesMerge = true;
 				usesSpread = true;
 				level += 1;
@@ -182,53 +182,10 @@ module.exports = function parse(data) {
 		return attributes + '}';
 	}
 
-	// loop through all HTML tags in code
-	while (match = tagRegExp.exec(data)) {
-		// skip the ones we already processed
-		if (match.index < lastIndex) continue;
-		let text = data.substring(lastIndex, match.index).replace(/^[ \t]+|[ \t]$/g, ' ').trim();
-		lastIndex = match.index + match[0].length;
-		// if we have some leading text (before the first tag)
-		if (text.length > 0) {
-			// it must be a text node
-			resultObject.render += handleText(text);
-		}
-		// if we found the tag's definition, skip it
-		if (match[2] === resultObject.tagName) continue;
-		if (match[1]) {
-			// closing tag
-			let expected = tagStack.pop();
-			if (expected !== match[2]) {
-				throw new Error('Unexpected end of tag: ' + match[2] + '; expected to end ' + expected);
-			}
-			resultObject.render = resultObject.render.replace(/,\s*$/g, '') + ')), ';
-		} else {
-			// opening tag
-			tagStack.push(match[2]);
-			let attributes = makeAttributes(match[3]);
-			resultObject.render += `Tag('${match[2]}', ${attributes}`;
-			if (!match[4]) {
-				// not a self-closing tag, so prepare for it's content
-				resultObject.render += ', [].concat(';
-			} else {
-				// self-closing tag, close it immediately
-				resultObject.render += '), ';
-				tagStack.pop();
-			}
-		}
-	}
-	if (tagStack.length > 0) {
-		throw new Error('Unclosed tags: ' + tagStack.join(', '));
-	}
+	resultObject.render = handleText(data, true);
 	if (level > 0) {
 		throw new Error('Unexpected end of block');
 	}
-	// if we have content after the last found tag node
-	if (data.substr(lastIndex).trim().length > 0) {
-		// it must be a text node
-		resultObject.render += handleText(data.substr(lastIndex).replace(/^[ \t]+|[ \t]$/g, ' ').trim());
-	}
-	resultObject.render = resultObject.render.replace(/,\s*$/g, '');
 
 	// add helper functions that were used by the code
 	if (usesMerge) {
