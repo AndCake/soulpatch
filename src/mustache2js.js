@@ -4,13 +4,6 @@ const commentRegExp = /<!--(?:[^-]|-[^-])*-->/g;
 const syntax = /\{\{\s*([^\}]+)\s*\}\}\}?/g;
 
 /* helper functions to be used inside the generated code */
-const Tag = 'function Tag(n,e,r){var t=Object.keys(e);for(var a=0,g=t.length,o;o=t[a],a<g;a+=1){t[a]=o+\'="\'+e[o]+\'"\'}return"<"+n+(t.length>0?" "+t.join(" "):"")+">"+(r && r.join("")||"")+"</"+n+">"}'/*`function Tag(name, attrs, content) {
-    var attrList = Object.keys(attrs);
-    for (var i = 0, len = attrList.length, attr; attr = attrList[i], i < len; i += 1) {
-        attrList[i] = attr + '="' + attrs[attr] + '"';
-    }
-    return '<' + name + (attrList.length > 0 ? ' ' + attrList.join(' ') : '') + '>' + (content && content.join('') || '') + '</' + name + '>';
-}`*/;
 
 /** @function safeAccess
  * safely access the given property in the object obj.
@@ -20,17 +13,18 @@ const Tag = 'function Tag(n,e,r){var t=Object.keys(e);for(var a=0,g=t.length,o;o
  * @param escape (Boolean) - if the value should be HTML escaped to prevent XSS attacks and such
  * @return any
  */
-const safeAccess = 'function safeAccess(t,e,r){if(!e)return t;if("."===e[0])return t[e];for(e=e.split(".");e.length>0&&void 0!==(t=t[e.shift()]););return"string"==typeof t&&r===!0?t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;").replace(/>/g,"&gt;"):"function"==typeof t?t():"number"==typeof t?t:t||""}'/*`function safeAccess(obj, attrs, escape) {
+const safeAccess = 'function safeAccess(e,t,r){if(!t)return e;if("."===t[0])return e[t];var l=t.split(" ");for(t=l[0].split(".");t.length>0&&void 0!==(e=e[t.shift()]););return"string"==typeof e&&!0===r?e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;").replace(/>/g,"&gt;"):"function"==typeof e?e.apply(null,l.slice(1)):"number"==typeof e?e:e||""}'/*`function safeAccess(obj, attrs, escape) {
 	if (!attrs) return obj;
 	if (attrs[0] === '.') {
 		return obj[attrs];
 	}
-	attrs = attrs.split('.');
+	var parts = attrs.split(' ');
+	attrs = parts[0].split('.');
 	while (attrs.length > 0 && typeof (obj = obj[attrs.shift()]) !== 'undefined');
 	if (typeof obj === 'string' && escape === true) {
 		return obj.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/>/g, '&gt;');
 	} else if (typeof obj === 'function') {
-		return obj();
+		return obj.apply(null, parts.slice(1));
 	} else {
 		return typeof obj === 'number' ? obj : (obj || '');
 	}

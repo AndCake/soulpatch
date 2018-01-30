@@ -1,7 +1,11 @@
 let page = 'index';
 let pageData = {
-    welcomeHeadline: 'Hallo, Welt!',
-    recommendationHeadline: 'Das hier gibt\'s: ',
+    _: {
+        i18n: function(a, b) {
+            var translations = {'welcomeHeadline': 'Hallo, Welt!'};
+            return translations[a] || (a + ' ' + b);
+        }
+    },
     featuredProducts: [{
         id: '1',
         url: '/product1',
