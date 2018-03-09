@@ -37,10 +37,11 @@ const safeAccess = 'function safeAccess(e,t,r){if(!t)return e;if("."===t[0])retu
  * @param value (String) - the property whose value should be read from the object
  * @return Array
  */
-const toArray = 'function toArray(t,e){var r=safeAccess(t,e);return r?"[object Array]"===Object.prototype.toString.call(r)?r:"function"==typeof r?r():[r]:[]}'/*`function toArray(data, value) {
+const toArray = 'function toArray(t,e){var o=safeAccess(t,e);if(o){var r=Object.getPrototypeOf([]);return Object.getPrototypeOf(o)===r||Object.getPrototypeOf(Object.getPrototypeOf(o))===r?o:"function"==typeof o?o():[o]}return[]}'/*`function toArray(data, value) {
 	var dataValue = safeAccess(data, value);
 	if (dataValue) {
-		if (Object.prototype.toString.call(dataValue) === '[object Array]') {
+		var arrayPrototype = Object.getPrototypeOf([]);
+		if (Object.getPrototypeOf(dataValue) === arrayPrototype || Object.getPrototypeOf(Object.getPrototypeOf(dataValue)) === arrayPrototype) {
 			return dataValue;
 		} else if (typeof dataValue === 'function') {
 			return dataValue();
