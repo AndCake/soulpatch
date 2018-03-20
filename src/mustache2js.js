@@ -41,7 +41,7 @@ const toArray = (function toArray(data, value) {
 	var dataValue = safeAccess(data, value);
 	if (dataValue) {
 		var arrayPrototype = Object.getPrototypeOf([]);
-		if ('object' !== typeof dataValue && (Object.getPrototypeOf(dataValue) === arrayPrototype || Object.getPrototypeOf(Object.getPrototypeOf(dataValue)) === arrayPrototype)) {
+		if ('object' === typeof dataValue && (Object.getPrototypeOf(dataValue) === arrayPrototype || Object.getPrototypeOf(Object.getPrototypeOf(dataValue)) === arrayPrototype)) {
 			return dataValue;
 		} else if (typeof dataValue === 'function') {
 			return dataValue();
