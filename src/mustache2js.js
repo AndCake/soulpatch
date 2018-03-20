@@ -13,7 +13,7 @@ const syntax = /\{\{\s*([^\}]+)\s*\}\}\}?/g;
  * @param escape (Boolean) - if the value should be HTML escaped to prevent XSS attacks and such
  * @return any
  */
-const safeAccess = 'function safeAccess(e,t,r){if(!t)return e;if("."===t[0])return e[t];var l=t.split(" ");for(t=l[0].split(".");t.length>0&&void 0!==(e=e[t.shift()]););return"string"==typeof e&&!0===r?e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;").replace(/>/g,"&gt;"):"function"==typeof e?e.apply(null,l.slice(1)):"number"==typeof e?e:e||""}'/*`function safeAccess(obj, attrs, escape) {
+const safeAccess = (function safeAccess(obj, attrs, escape) {
 	if (!attrs) return obj;
 	if (attrs[0] === '.') {
 		return obj[attrs];
@@ -28,7 +28,7 @@ const safeAccess = 'function safeAccess(e,t,r){if(!t)return e;if("."===t[0])retu
 	} else {
 		return typeof obj === 'number' ? obj : (obj || '');
 	}
-}`*/;
+}).toString();
 
 /** @function toArray
  * turn property value of an object into an array
@@ -37,11 +37,11 @@ const safeAccess = 'function safeAccess(e,t,r){if(!t)return e;if("."===t[0])retu
  * @param value (String) - the property whose value should be read from the object
  * @return Array
  */
-const toArray = 'function toArray(t,e){var o=safeAccess(t,e);if(o){var r=Object.getPrototypeOf([]);return Object.getPrototypeOf(o)===r||Object.getPrototypeOf(Object.getPrototypeOf(o))===r?o:"function"==typeof o?o():[o]}return[]}'/*`function toArray(data, value) {
+const toArray = (function toArray(data, value) {
 	var dataValue = safeAccess(data, value);
 	if (dataValue) {
 		var arrayPrototype = Object.getPrototypeOf([]);
-		if (Object.getPrototypeOf(dataValue) === arrayPrototype || Object.getPrototypeOf(Object.getPrototypeOf(dataValue)) === arrayPrototype) {
+		if ('object' !== typeof dataValue && (Object.getPrototypeOf(dataValue) === arrayPrototype || Object.getPrototypeOf(Object.getPrototypeOf(dataValue)) === arrayPrototype)) {
 			return dataValue;
 		} else if (typeof dataValue === 'function') {
 			return dataValue();
@@ -49,7 +49,7 @@ const toArray = 'function toArray(t,e){var o=safeAccess(t,e);if(o){var r=Object.
 	} else {
 		return [];
 	}
-}`*/;
+}).toString();
 
 /** @function spread
  * turns an array of arrays into an array of all containing elements (reduces the array depth by 1)
@@ -57,13 +57,13 @@ const toArray = 'function toArray(t,e){var o=safeAccess(t,e);if(o){var r=Object.
  * @param array (Array) - the array to spread the values along
  * @return Array - a new array containing all the values of the sub elements
  */
-const spread = 'function spread(t){var e=[];return t.forEach(function(t){e=e.concat(t)}),e}'/*`function spread(array) {
+const spread = (function spread(array) {
 	var result = [];
 	array.forEach(function(entry) {
 		result = result.concat(entry);
 	});
 	return result;
-}`*/;
+}).toString();
 
 /** @function merge
  * merges any number of objects into the target object
@@ -72,7 +72,7 @@ const spread = 'function spread(t){var e=[];return t.forEach(function(t){e=e.con
  * @param objn (Object) - all nth object to be merged into the target object
  * @return Object - the target object
  */
-const merge = 'function merge(t){return[].slice.call(arguments,1).forEach(function(e){for(var r in e)t[r]=e[r]}),t}'/*`function merge(target) {
+const merge = (function merge(target) {
 	[].slice.call(arguments, 1).forEach(function (arg) {
 		for (var all in arg) {
 			target[all] = arg[all];
@@ -80,10 +80,10 @@ const merge = 'function merge(t){return[].slice.call(arguments,1).forEach(functi
 	});
 
 	return target;
-}`*/;
+}).toString();
 
 /* this is the base structure of the template */
-const baseCode = 'module.exports = (function(){ {{helperFunctions}};return{render:function(data){return [].concat({{render}}\'\').join("")}}}());'/*`function() {
+const baseCode = `module.exports = (function() {
 	{{helperFunctions}}
 
 	return {
@@ -91,7 +91,7 @@ const baseCode = 'module.exports = (function(){ {{helperFunctions}};return{rende
 			return [].concat({{render}}'').join('')
 		}
 	};
-}());`*/;
+}());`;
 
 
 /** takes an HTML string containing mustache code and turns it into executable JS code that generates a vdom */

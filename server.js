@@ -18,7 +18,8 @@ let pageData = {
         name: 'Hand Creme',
         image: 'https://kendrakandlestar.files.wordpress.com/2012/09/potions_trollsnot.jpg',
         price: 20.95
-    }]
+    }],
+    checking: true
 };
 
 page = require('./compiled/' + page);
