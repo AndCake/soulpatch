@@ -41,10 +41,11 @@ const toArray = (function toArray(data, value) {
 	var dataValue = safeAccess(data, value);
 	if (dataValue) {
 		var arrayPrototype = Object.getPrototypeOf([]);
-		if ('object' === typeof dataValue && (Object.getPrototypeOf(dataValue) === arrayPrototype || Object.getPrototypeOf(Object.getPrototypeOf(dataValue)) === arrayPrototype)) {
+		var valuePrototype = 'object' === typeof dataValue && Object.getPrototypeOf(dataValue) || false;
+		if (valuePrototype && (valuePrototype === arrayPrototype || Object.getPrototypeOf(valuePrototype) === arrayPrototype)) {
 			return dataValue;
 		} else if (typeof dataValue === 'function') {
-			return dataValue();
+			return dataValue(data);
 		} else return [dataValue];
 	} else {
 		return [];
