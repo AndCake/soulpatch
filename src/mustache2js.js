@@ -1,6 +1,3 @@
-const tagRegExp = /<(\/?)([\w-]+)([^>]*?)(\/?)>/g;
-const attrRegExp = /([\w_-]+)(?:=(?:'([^']*?)'|"([^"]*?)"))?/g;
-const commentRegExp = /<!--(?:[^-]|-[^-])*-->/g;
 const syntax = /\{\{\s*([^\}]+)\s*\}\}\}?/g;
 
 /* helper functions to be used inside the generated code */
@@ -102,12 +99,20 @@ module.exports = function parse(data) {
 		render: ''
 	};
 	let usesMerge = false, usesRenderStyle = false, usesSpread = false;
-	let match, lastIndex = 0, level = 0, tagStack = [];
+	let match, lastIndex = 0, level = 0;
 
 	// return the correct data level for multi-level mustache blocks
 	function getData() {
 		return `data${level === 0 ? '' : '$' + level}`;
 	}
+    
+    function countLines(input) {
+        let result = 1, newline = /\n/g;
+        while (newline.exec(input)) {
+            result += 1;
+        }
+        return result;
+    }
 
 	// text is the only place where mustache code can be found
 	function handleText(text, isAttr) {
@@ -140,7 +145,7 @@ module.exports = function parse(data) {
 				result += '\'\'); })).join(""))' + cat;
 				level -= 1;
 				if (level < 0) {
-					throw new Error('Unexpected end of block: ' + key.substr(1));
+					throw new Error('Unexpected end of block: ' + key.substr(1) + ' line ' + countLines(text.substring(0, lastIndex)));
 				}
 			} else if (key[0] === '^') {
 				// handle inverted block start
@@ -183,7 +188,7 @@ module.exports = function parse(data) {
 
 	resultObject.render = handleText(data, true);
 	if (level > 0) {
-		throw new Error('Unexpected end of block');
+		throw new Error('Missing end of block');
 	}
 
 	// add helper functions that were used by the code

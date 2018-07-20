@@ -24,8 +24,13 @@ function run(templates, outputDir, basePath) {
         if (target[0] === '/') target = target.substr(1);
         let targetName = path.basename(template).split('.').slice(0, -1).join('.');
         mkderp.sync(path.join(outputDir, target));
-        fs.writeFileSync(path.join(outputDir, target, targetName + '.js'), compile(code), 'utf8');
-        console.log('Compiled ' + template);
+        try {
+            fs.writeFileSync(path.join(outputDir, target, targetName + '.js'), compile(code), 'utf8');
+            console.log('Compiled ' + template);
+        } catch (failure) {
+            console.log('Failed ' + template + ': ' + failure);
+            process.exit(1);
+        }
     });
 }
 
