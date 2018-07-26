@@ -41,14 +41,14 @@ options = nopt(options, shortOptions);
 
 if (options.help) {
     let package = require('../package.json');
-    let usage = `${package.name} [--outputdir <output-directory>] <templates>
+    let usage = `${package.name} [--outputdir <output-directory>] <templates> [<source-directory>]
 
 	[-o, --outputdir] :: the directory to write the individual files into
 	[-h, --help]      :: this help
 
 Example:
 
-    ${package.name} -o ./dest 'src/**/*.mustache'
+    ${package.name} -o ./dest 'src/**/*.mustache' src
 
 Note:
 
@@ -61,7 +61,7 @@ Note:
 
 glob(options.argv.remain[0], {}, function(err, files) {
 	if (!err) {
-		let basePath = files.map(file => path.dirname(file)).reduce((a, b) => {
+		let basePath = options.argv.remain[1] || files.map(file => path.dirname(file)).reduce((a, b) => {
 			if (!a) return b;
             while (b.indexOf(a) !== 0 && a.length > 0) { a = a.split('/').slice(0, -1).join('/'); } return a;
         });

@@ -3,7 +3,7 @@
   "version": "0.0.5",
   "description": "A tiny CLI compiler for Mustache files to produce CommonJS javascript modules.",
   "scripts": {
-    "test:compile": "./bin/compiler.js -o compiled 'templates/**/*.mustache'",
+    "test:compile": "./bin/compiler.js -o compiled 'templates/**/*.mustache' templates",
     "test:render": "node server.js > test.html",
     "test": "npm run test:compile && npm run test:render"
   },
