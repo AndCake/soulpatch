@@ -114,14 +114,14 @@ module.exports = function parse(data) {
 		let match, result = '', lastIndex = 0;
 		let cat = isAttr ? ' + ' : ', ';
 		if (!text.match(syntax)) {
-			return result += "'" + text.substr(lastIndex).replace(/\n/g, '').replace(/'/g, '\\\'') + "'" + cat;
+			return result += "'" + text.substr(lastIndex).replace(/\n/g, '\\n').replace(/'/g, '\\\'') + "'" + cat;
 		}
 		// locate mustache syntax within the text
 		while (match = syntax.exec(text)) {
 			if (match.index < lastIndex) continue;
-			let frag = text.substring(lastIndex, match.index).replace(/^\s+/g, '');
+			let frag = text.substring(lastIndex, match.index);
 			if (frag.length > 0) {
-				result += "'" + frag.replace(/\n/g, '').replace(/'/g, '\\\'') + "'" + cat;
+				result += "'" + frag.replace(/\n/g, '\\n').replace(/'/g, '\\\'') + "'" + cat;
 			}
 			lastIndex = match.index + match[0].length;
 			let key = match[1];
@@ -144,7 +144,22 @@ module.exports = function parse(data) {
 				}
 			} else if (key[0] === '^') {
 				// handle inverted block start
-				result += `((safeAccess(${getData()}, '${value}') && (typeof safeAccess(${getData()}, '${value}') === 'boolean' || safeAccess(${getData()}, '${value}').length > 0)) ? [] : spread([1].map(function() { var data$${level + 1} = merge({}, data${0 >= level ? '' : '$' + level}); return [].concat(`;
+				result += `(
+					(
+						safeAccess(${getData()}, '${value}') && 
+						(
+							typeof safeAccess(${getData()}, '${value}') === 'boolean' || 
+							safeAccess(${getData()}, '${value}').length > 0 ||
+							Object.prototype.toString.call(safeAccess(${getData()}, '${value}')) !== '[object Array]'
+						)
+					) ? 
+						[] 
+					: 
+						spread(
+							[1].map(
+								function() { 
+									var data$${level + 1} = merge({}, data${0 >= level ? '' : '$' + level}); 
+									return [].concat(`;
 				usesMerge = true;
 				usesSpread = true;
 				level += 1;
@@ -161,21 +176,9 @@ module.exports = function parse(data) {
 			} // ignore comments
 		}
 		if (text.substr(lastIndex).length > 0) {
-			result += "'" + text.substr(lastIndex).replace(/\n/g, '').replace(/'/g, '\\\'') + "'" + cat;
+			result += "'" + text.substr(lastIndex).replace(/\n/g, '\\n').replace(/'/g, '\\\'') + "'" + cat;
 		}
 		return result;
-	}
-
-	// generate attribute objects for vdom creation
-	function makeAttributes(attrs) {
-		let attributes = '{';
-		let attr;
-
-		while ((attr = attrRegExp.exec(attrs))) {
-			if (attributes !== '{') attributes += ', ';
-			attributes += '"' + attr[1].toLowerCase() + '": ' + handleText(attr[2] || attr[3] || '', true).replace(/\s*[,+]\s*$/g, '');
-		}
-		return attributes + '}';
 	}
 
 	resultObject.render = handleText(data, true);
