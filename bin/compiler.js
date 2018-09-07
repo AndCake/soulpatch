@@ -16,7 +16,7 @@ function removeByteOrderMark(text) {
 function run(templates, outputDir, basePath) {
     let fs = require('fs');
 	let mkderp = require('mkdirp');
-	
+
     templates.forEach(template => {
 		let code = fs.readFileSync(template, 'utf8');
 		code = removeByteOrderMark(code);
@@ -44,7 +44,7 @@ shortOptions = {
 };
 options = nopt(options, shortOptions);
 
-if (options.help) {
+if (options.help || options.argv.remain.length <= 0) {
     let package = require('../package.json');
     let usage = `${package.name} [--outputdir <output-directory>] <templates> [<source-directory>]
 

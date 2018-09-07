@@ -7,6 +7,7 @@
     "test:render": "node server.js > test.html",
     "test": "npm run test:compile && npm run test:render && diff -rup --color snapshot.html test.html"
   },
+  "main": "src/mustache2js.js",
   "bin": {
     "soulpatch": "./bin/compiler.js"
   },

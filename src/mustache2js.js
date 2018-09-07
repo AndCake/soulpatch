@@ -92,7 +92,7 @@ const baseCode = `module.exports = (function() {
 }());`;
 
 
-/** takes an HTML string containing mustache code and turns it into executable JS code that generates a vdom */
+/** takes an HTML string containing mustache code and turns it into executable JS code that generates the output */
 module.exports = function parse(data) {
 	let resultObject = {
 		helperFunctions: [safeAccess],
@@ -105,7 +105,7 @@ module.exports = function parse(data) {
 	function getData() {
 		return `data${level === 0 ? '' : '$' + level}`;
 	}
-    
+
     function countLines(input) {
         let result = 1, newline = /\n/g;
         while (newline.exec(input)) {
@@ -151,19 +151,19 @@ module.exports = function parse(data) {
 				// handle inverted block start
 				result += `(
 					(
-						safeAccess(${getData()}, '${value}') && 
+						safeAccess(${getData()}, '${value}') &&
 						(
-							typeof safeAccess(${getData()}, '${value}') === 'boolean' || 
+							typeof safeAccess(${getData()}, '${value}') === 'boolean' ||
 							safeAccess(${getData()}, '${value}').length > 0 ||
 							Object.prototype.toString.call(safeAccess(${getData()}, '${value}')) !== '[object Array]'
 						)
-					) ? 
-						[] 
-					: 
+					) ?
+						[]
+					:
 						spread(
 							[1].map(
-								function() { 
-									var data$${level + 1} = merge({}, data${0 >= level ? '' : '$' + level}); 
+								function() {
+									var data$${level + 1} = merge({}, data${0 >= level ? '' : '$' + level});
 									return [].concat(`;
 				usesMerge = true;
 				usesSpread = true;
