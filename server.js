@@ -3,7 +3,7 @@ let pageData = {
     _: {
         i18n: function(a, b) {
             var translations = {'welcomeHeadline': 'Hallo, Welt!'};
-            return translations[a] || (a + ' ' + b);
+            return translations[a] || ((this[a] || a) + ' ' + (this[b] || b));
         }
     },
     featuredProducts: [{
