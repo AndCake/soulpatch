@@ -12,13 +12,13 @@ const syntax = /\{\{\s*([^\}]+)\s*\}\}\}?/g;
  */
 const safeAccess = (function safeAccess(obj, attrs, escape) {
 	var originalObject = obj;
-	if (!attrs) return obj;
+	if (!attrs || !obj) return obj;
 	if (attrs[0] === '.') {
 		return obj[attrs];
 	}
 	var parts = attrs.split(' ');
 	attrs = parts[0].split('.');
-	while (attrs.length > 0 && typeof (obj = obj[attrs.shift()]) !== 'undefined');
+	while (attrs.length > 0 && typeof (obj = obj[attrs.shift()]) !== 'undefined' && obj !== null);
 	if (typeof obj === 'string' && escape === true) {
 		return obj.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/>/g, '&gt;');
 	} else if (typeof obj === 'function') {

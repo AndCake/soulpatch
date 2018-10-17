@@ -19,6 +19,9 @@ let pageData = {
         image: 'https://kendrakandlestar.files.wordpress.com/2012/09/potions_trollsnot.jpg',
         price: 20.95
     }],
+    nullPath: {
+        somewhere: null
+    },
     checking: true
 };
 
