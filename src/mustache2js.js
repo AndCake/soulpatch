@@ -22,7 +22,7 @@ const safeAccess = (function safeAccess(obj, attrs, escape) {
 	if (typeof obj === 'string' && escape === true) {
 		return obj.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/>/g, '&gt;');
 	} else if (typeof obj === 'function') {
-		return obj.apply(originalObject, parts.slice(1));
+		return obj.apply(originalObject, parts.slice(1).concat(originalObject));
 	} else {
 		return typeof obj === 'number' ? obj : (obj || '');
 	}

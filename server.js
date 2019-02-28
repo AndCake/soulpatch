@@ -1,9 +1,9 @@
 let page = 'index';
 let pageData = {
     _: {
-        i18n: function(a, b) {
+        i18n: function(a, b, c) {
             var translations = {'welcomeHeadline': 'Hallo, Welt!'};
-            return translations[a] || ((this[a] || a) + ' ' + (this[b] || b));
+            return translations[a] || ((c[a] || a) + ' ' + (c[b] || b));
         }
     },
     featuredProducts: [{
